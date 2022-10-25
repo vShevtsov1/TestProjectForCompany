@@ -4,16 +4,12 @@ import com.example.TestProjectForCompany.entities.employees;
 import com.example.TestProjectForCompany.exceptions.dbException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@CrossOrigin
 public class employeesService {
 
     @Autowired
@@ -30,7 +27,7 @@ public class employeesService {
 
 
     public List<employees> getAll() {
-        String sql = "SELECT * FROM tblEmployees";
+            String sql = "SELECT empID,empName,empActive,emp_dpID,dpName FROM tblEmployees e join tblDepartments d on e.emp_dpID = d.dpID;";
         List<employees> customers = jdbcTemplate.query(
                 sql, new ResultSetExtractor<List<employees>>() {
                     @Override
@@ -41,6 +38,8 @@ public class employeesService {
                             e.setEmpID(rs.getLong(1));
                             e.setEmpname(rs.getString(2));
                             e.setEmpactive(rs.getBoolean(3));
+                            e.getEmp_dpID().setDpID(rs.getLong(4));
+                            e.getEmp_dpID().setDpname(rs.getString(5));
                             employees.add(e);
                         }
                         return employees;
@@ -51,11 +50,17 @@ public class employeesService {
 
 
     public employees getById( Long id) {
-        String sql = "SELECT * FROM tblEmployees where empID = " + id;
+        String sql = "SELECT empID,empName,empActive,emp_dpID,dpName FROM tblEmployees e join tblDepartments d on e.emp_dpID = d.dpID where empID = " + id;
         employees employees = jdbcTemplate.queryForObject(sql, new RowMapper<com.example.TestProjectForCompany.entities.employees>() {
             @Override
             public com.example.TestProjectForCompany.entities.employees mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return new employees(rs.getLong(1), rs.getString(2), rs.getBoolean(3), null);
+                employees e = new employees();
+                e.setEmpID(rs.getLong(1));
+                e.setEmpname(rs.getString(2));
+                e.setEmpactive(rs.getBoolean(3));
+                e.getEmp_dpID().setDpID(rs.getLong(4));
+                e.getEmp_dpID().setDpname(rs.getString(5));
+                return e;
             }
         });
         return employees;
@@ -96,5 +101,27 @@ public class employeesService {
         } else {
             throw new dbException("Cannot delete data");
         }
+    }
+
+    public List<employees> search(String partOfName) {
+        String sql = "SELECT empID,empName,empActive,emp_dpID,dpName FROM tblEmployees e join tblDepartments d on e.emp_dpID = d.dpID where empName like\"%"+partOfName+"%\"";
+        List<employees> customers = jdbcTemplate.query(
+                sql, new ResultSetExtractor<List<employees>>() {
+                    @Override
+                    public List<employees> extractData(ResultSet rs) throws SQLException, DataAccessException {
+                        List<employees> employees = new ArrayList<>();
+                        while (rs.next()) {
+                            employees e = new employees();
+                            e.setEmpID(rs.getLong(1));
+                            e.setEmpname(rs.getString(2));
+                            e.setEmpactive(rs.getBoolean(3));
+                            e.getEmp_dpID().setDpID(rs.getLong(4));
+                            e.getEmp_dpID().setDpname(rs.getString(5));
+                            employees.add(e);
+                        }
+                        return employees;
+                    }
+                });
+        return customers;
     }
 }

@@ -53,7 +53,7 @@ public class departmentsControlleer implements departmentsRepo {
     }
 
     @Override
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(summary = "Endpoint to delete exists department by id")
     @ApiResponse(responseCode = "200", description = "department deteled")
     @ApiResponse(responseCode = "404", description = "department not found")

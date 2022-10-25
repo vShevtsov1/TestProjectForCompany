@@ -31,7 +31,7 @@ public class employeesController implements employeesRepo {
     @Override
     @GetMapping("/{id}")
     @Operation(summary = "Get employee by id")
-    public ResponseEntity<employees> getById(@Parameter(description = "employee id to find")@PathVariable(name = "id") Long id) {
+    public ResponseEntity<employees> getById(@Parameter(description = "employee id to find") @PathVariable(name = "id") Long id) {
         try {
             return ResponseEntity.ok(employeesService.getById(id));
         } catch (Exception e) {
@@ -51,16 +51,23 @@ public class employeesController implements employeesRepo {
     }
 
     @Override
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(summary = "Endpoint to delete exists employee by id")
     @ApiResponse(responseCode = "200", description = "employee deleted")
     @ApiResponse(responseCode = "404", description = "employee not found")
-    public ResponseEntity<employees> delete(@Parameter(description = "employee id to delete")@PathVariable("id") Long id) {
+    public ResponseEntity<employees> delete(@Parameter(description = "employee id to delete") @PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(employeesService.delete(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Override
+    @GetMapping("/search/{partOfName}")
+    @Operation(summary = "Endpoint to search all employees by part of the name")
+    public List<employees> search(@Parameter(description = "part of name to be find") @PathVariable("partOfName") String partOfName) {
+        return employeesService.search(partOfName);
     }
 
 }

@@ -11,6 +11,7 @@ public interface employeesRepo  {
     ResponseEntity<employees> getById(Long id);
     ResponseEntity<employees> save(employees employees);
     ResponseEntity<employees> delete(Long id);
+    List<employees> search(String partOfName);
     
 
 }
